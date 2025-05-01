@@ -1,0 +1,45 @@
+@startuml renting
+title:賃貸契約の開始から終了まで
+participant 賃借人 as lessee
+participant 賃貸人 as lessor
+participant 不動産業者 as agent
+participant リフォーム業者 as reformer
+
+database "データベース" as db
+
+group 賃貸契約の開始
+    lessee -> lessor : 賃貸契約の申し込み
+    lessor -> lessee : 賃貸契約の承諾
+    lessee -> lessor : 敷金・礼金の支払い
+    lessor -> agent : 広告費の支払い
+    lessee -> lessor : 初月の日割り家賃の支払い
+    lessor -> db : 賃貸契約の登録
+end
+
+group 賃貸契約の維持
+    lessee -> lessor : 家賃の支払い
+    lessor -> db : 家賃の受領登録
+end
+
+group 修繕
+    lessor -> reformer : 修繕費用の支払い
+    lessor -> db : 修繕情報の登録
+end
+
+group 賃貸契約の更新
+    lessee -> lessor : 賃貸契約の更新申し込み
+    lessee -> lessor : 更新料の支払い
+    lessor -> agent : 更新手数料の支払い
+    lessor -> db : 賃貸契約の更新登録
+end
+
+group 賃貸契約の終了
+    lessee -> lessor : 退去の申し出
+    lessee -> lessor : 最終月の日割り家賃の支払い
+    lessor -> reformer : 退去時の回復費用の支払い
+    lessor -> lessee : 敷金の返還
+    lessee -> lessor : 退去時の回復費用の支払い
+    lessor -> db : 賃貸契約の終了登録
+end
+
+@enduml
