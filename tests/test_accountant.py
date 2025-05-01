@@ -17,10 +17,10 @@ def contract():
 
 
 def test_月ごとの支払い履歴を確認する(contract):
-    contract.receive_fee(date_=date(2020, 1, 1))
-    contract.receive_fee(date_=date(2020, 2, 1))
-    contract.receive_fee(date_=date(2020, 3, 1))
-    assert contract.payments.history(2020) == {
+    contract.receive_fee(date_=date(2020, 1, 1), fee=100)
+    contract.receive_fee(date_=date(2020, 2, 1), fee=100)
+    contract.receive_fee(date_=date(2020, 3, 1), fee=100)
+    assert contract.receptions.history(2020) == {
         1: 100,
         2: 100,
         3: 100,
@@ -46,8 +46,8 @@ def test_日割りの家賃と敷金礼金を受け取る(contract):
     contract.receive_fee(
         date(2019, 12, 20), fee=contract.calculate_prorated_initial_fee()
     )
-    assert contract.payments.total() == 1000 + 1000 + 54
-    assert contract.payments.history(2019) == {
+    assert contract.receptions.total() == 1000 + 1000 + 54
+    assert contract.receptions.history(2019) == {
         1: 0,
         2: 0,
         3: 0,

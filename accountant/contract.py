@@ -9,16 +9,13 @@ class Contract:
         self.key_money = key_money
         self.start = start
         self.end = end
-        self.payments = Payments()
+        self.receptions = Receptions()
 
-    def receive_initial_cost(self, date_):
-        self.payments.append(date_, self.deposit + self.key_money)
+    def receive_initial_cost(self, date_: date):
+        self.receptions.append(Reception(date_, self.deposit + self.key_money))
 
-    def receive_fee(self, date_, fee=None):
-        if fee is None:
-            self.payments.append(date_, self.fee)
-        else:
-            self.payments.append(date_, fee)
+    def receive_fee(self, date_: date, fee: int):
+        self.receptions.append(Reception(date_, fee))
 
     def calculate_prorated_initial_fee(self):
         year = self.start.year
@@ -26,19 +23,26 @@ class Contract:
         days_in_month = calendar.monthrange(year, month)[1]
         return self.fee * (days_in_month - self.start.day) // days_in_month
 
-class Payments:
+
+class Reception:
+    def __init__(self, date_: date, amount: int):
+        self.date = date_
+        self.amount = amount
+
+
+class Receptions:
     def __init__(self):
         self.list = []
 
     def total(self):
-        return sum(payment[1] for payment in self.list)
+        return sum(reception.amount for reception in self.list)
 
-    def append(self, date_, amount):
-        self.list.append((date_, amount))
+    def append(self, reception: Reception):
+        self.list.append(reception)
 
-    def history(self, year):
+    def history(self, year: int):
         history = {month: 0 for month in range(1, 13)}
-        for payment_date, amount in self.list:
-            if payment_date.year == year:
-                history[payment_date.month] += amount
+        for reception in self.list:
+            if reception.date.year == year:
+                history[reception.date.month] += reception.amount
         return history
