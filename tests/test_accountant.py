@@ -2,7 +2,7 @@ from datetime import date
 
 from pytest import fixture
 
-from accountant.contract import Contract
+from accountant.contract import Contract, Transaction
 
 
 @fixture
@@ -16,48 +16,31 @@ def contract():
     )
 
 
-def test_月ごとの支払い履歴を確認する(contract):
-    contract.receive_fee(date_=date(2020, 1, 1), fee=100)
-    contract.receive_fee(date_=date(2020, 2, 1), fee=100)
-    contract.receive_fee(date_=date(2020, 3, 1), fee=100)
-    assert contract.receptions.history(2020) == {
-        1: 100,
-        2: 100,
-        3: 100,
-        4: 0,
-        5: 0,
-        6: 0,
-        7: 0,
-        8: 0,
-        9: 0,
-        10: 0,
-        11: 0,
-        12: 0,
-    }
+def test_取引履歴を確認する(contract):
+    transactions = contract.transactions
+    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date_=date(2020, 2, 1), amount=100, kind="敷金"))
+    transactions.register(Transaction(date_=date(2020, 3, 1), amount=100, kind="礼金"))
+    assert contract.transactions.history() == [
+        {"日付": date(2020, 1, 1), "金額": 100, "種類": "家賃"},
+        {"日付": date(2020, 2, 1), "金額": 100, "種類": "敷金"},
+        {"日付": date(2020, 3, 1), "金額": 100, "種類": "礼金"},
+    ]
+
+
+def test_合計受取額を確認する(contract):
+    transactions = contract.transactions
+    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="手数料"))
+    assert contract.transactions.total_reception() == 200
 
 
 def test_契約開始時の日割りの家賃を計算する(contract):
     result = contract.calculate_prorated_initial_fee()
-    assert result == 100 * (31 - 14) // 31
+    assert result == 100 * (31 - 14 + 1) // 31
 
 
-def test_日割りの家賃と敷金礼金を受け取る(contract):
-    contract.receive_initial_cost(date(2019, 12, 20))
-    contract.receive_fee(
-        date(2019, 12, 20), fee=contract.calculate_prorated_initial_fee()
-    )
-    assert contract.receptions.total() == 1000 + 1000 + 54
-    assert contract.receptions.history(2019) == {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-        6: 0,
-        7: 0,
-        8: 0,
-        9: 0,
-        10: 0,
-        11: 0,
-        12: 2054,
-    }
+def test_契約終了時の日割りの家賃を計算する(contract):
+    result = contract.calculate_prorated_final_fee()
+    assert result == 100 * 13 // 31
