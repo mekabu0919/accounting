@@ -1,4 +1,11 @@
-from .contract import Contract
+from typing import TypedDict
+
+from .contract import Contract, JSONContract
+
+
+class JSONProject(TypedDict):
+    name: str
+    contracts: list[JSONContract]
 
 
 class Project:
@@ -9,14 +16,14 @@ class Project:
     def add_contract(self, contract):
         self.contracts.append(contract)
 
-    def to_json(self):
+    def to_json(self) -> JSONProject:
         return {
             "name": self.name,
             "contracts": [contract.to_json() for contract in self.contracts],
         }
 
     @classmethod
-    def from_json(cls, json_data):
+    def from_json(cls, json_data: JSONProject) -> "Project":
         return cls(
             json_data["name"],
             [
