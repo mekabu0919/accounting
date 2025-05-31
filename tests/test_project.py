@@ -1,6 +1,6 @@
 from datetime import date
 
-from accountant.project import Project
+from accountant.project import Project, JSONProject
 from accountant.contract import Contract, Transactions, Transaction
 
 
@@ -85,7 +85,7 @@ def test_プロジェクトをJSON形式で保存():
 
 
 def test_JSON形式のプロジェクトデータを開く():
-    json_data = {
+    json_data: JSONProject = {
         "name": "Test Project",
         "contracts": [
             {
