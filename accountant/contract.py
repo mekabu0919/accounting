@@ -1,17 +1,20 @@
 import calendar
 from datetime import date
+from typing import TypedDict
+
+
+class JSONTransaction(TypedDict):
+    date: str
+    amount: int
+    kind: str
 
 
 class Transaction:
-    reception_kinds = [
-        "家賃", "敷金", "礼金", "更新料", "共益費", "保証料"
-    ]
-    payment_kinds = [
-        "手数料", "修繕費"
-    ]
+    reception_kinds = ["家賃", "敷金", "礼金", "更新料", "共益費", "保証料"]
+    payment_kinds = ["手数料", "修繕費"]
 
-    def __init__(self, date_: date, amount: int, kind: str):
-        self.date = date_
+    def __init__(self, date: date, amount: int, kind: str):
+        self.date = date
         self.amount = amount
         self.kind = kind
         self.type = self._judge_type()
@@ -24,39 +27,28 @@ class Transaction:
         else:
             raise ValueError(f"Invalid kind: {self.kind}")
 
-    def to_dict(self):
+    def to_json(self) -> JSONTransaction:
         return {
-            "日付": self.date,
-            "金額": self.amount,
-            "種類": self.kind,
+            "date": self.date.isoformat(),
+            "amount": self.amount,
+            "kind": self.kind,
         }
 
-
-class Contract:
-    def __init__(self, fee, deposit, key_money, start: date, end: date):
-        self.fee = fee
-        self.deposit = deposit
-        self.key_money = key_money
-        self.start = start
-        self.end = end
-        self.transactions = Transactions()
-
-    def calculate_prorated_initial_fee(self):
-        year = self.start.year
-        month = self.start.month
-        days_in_month = calendar.monthrange(year, month)[1]
-        return self.fee * (days_in_month - self.start.day + 1) // days_in_month
-
-    def calculate_prorated_final_fee(self):
-        year = self.end.year
-        month = self.end.month
-        days_in_month = calendar.monthrange(year, month)[1]
-        return self.fee * self.end.day // days_in_month
+    @classmethod
+    def from_json(cls, data: JSONTransaction) -> "Transaction":
+        return cls(
+            date.fromisoformat(data["date"]),
+            data["amount"],
+            data["kind"],
+        )
 
 
 class Transactions:
-    def __init__(self):
-        self.list = []
+    def __init__(self, initial_list: list[Transaction] = []):
+        for transaction in initial_list:
+            if not isinstance(transaction, Transaction):
+                raise TypeError("All items must be of type Transaction")
+        self.list = list(initial_list)
 
     def total_reception(self):
         return sum(
@@ -71,5 +63,68 @@ class Transactions:
     def register(self, reception: Transaction):
         self.list.append(reception)
 
-    def history(self):
-        return [reception.to_dict() for reception in self.list]
+    def to_json(self) -> list[JSONTransaction]:
+        return [transaction.to_json() for transaction in self.list]
+
+
+class JSONContract(TypedDict):
+    fee: int
+    deposit: int
+    key_money: int
+    start: str
+    end: str
+    transactions: list[JSONTransaction]
+
+
+class Contract:
+    def __init__(
+        self,
+        fee: int,
+        deposit: int,
+        key_money: int,
+        start: date,
+        end: date,
+        transactions: Transactions | None = None,
+    ):
+        self.fee = fee
+        self.deposit = deposit
+        self.key_money = key_money
+        self.start = start
+        self.end = end
+        self.transactions = transactions if transactions is not None else Transactions()
+
+    def calculate_prorated_initial_fee(self):
+        year = self.start.year
+        month = self.start.month
+        days_in_month = calendar.monthrange(year, month)[1]
+        return self.fee * (days_in_month - self.start.day + 1) // days_in_month
+
+    def calculate_prorated_final_fee(self):
+        year = self.end.year
+        month = self.end.month
+        days_in_month = calendar.monthrange(year, month)[1]
+        return self.fee * self.end.day // days_in_month
+
+    def to_json(self) -> JSONContract:
+        return {
+            "fee": self.fee,
+            "deposit": self.deposit,
+            "key_money": self.key_money,
+            "start": self.start.isoformat(),
+            "end": self.end.isoformat(),
+            "transactions": self.transactions.to_json(),
+        }
+
+    @classmethod
+    def from_json(cls, data: JSONContract) -> "Contract":
+        transactions = Transactions(
+            [Transaction.from_json(t) for t in data["transactions"]]
+        )
+        return cls(
+            fee=data["fee"],
+            deposit=data["deposit"],
+            key_money=data["key_money"],
+            start=date.fromisoformat(data["start"]),
+            end=date.fromisoformat(data["end"]),
+            transactions=transactions,
+        )

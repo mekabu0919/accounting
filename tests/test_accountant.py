@@ -18,21 +18,22 @@ def contract():
 
 def test_取引履歴を確認する(contract):
     transactions = contract.transactions
-    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
-    transactions.register(Transaction(date_=date(2020, 2, 1), amount=100, kind="敷金"))
-    transactions.register(Transaction(date_=date(2020, 3, 1), amount=100, kind="礼金"))
+    transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date=date(2020, 2, 1), amount=100, kind="敷金"))
+    transactions.register(Transaction(date=date(2020, 3, 1), amount=100, kind="礼金"))
     assert contract.transactions.history() == [
-        {"日付": date(2020, 1, 1), "金額": 100, "種類": "家賃"},
-        {"日付": date(2020, 2, 1), "金額": 100, "種類": "敷金"},
-        {"日付": date(2020, 3, 1), "金額": 100, "種類": "礼金"},
+        {"date": "2020-01-01", "amount": 100, "kind": "家賃"},
+        {"date": "2020-02-01", "amount": 100, "kind": "敷金"},
+        {"date": "2020-03-01", "amount": 100, "kind": "礼金"},
     ]
 
 
 def test_合計受取額を確認する(contract):
     transactions = contract.transactions
-    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
-    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="家賃"))
-    transactions.register(Transaction(date_=date(2020, 1, 1), amount=100, kind="手数料"))
+    transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="手数料"))
+    print(transactions.history())
     assert contract.transactions.total_reception() == 200
 
 
