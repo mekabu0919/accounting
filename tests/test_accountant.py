@@ -21,7 +21,7 @@ def test_取引履歴を確認する(contract):
     transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
     transactions.register(Transaction(date=date(2020, 2, 1), amount=100, kind="敷金"))
     transactions.register(Transaction(date=date(2020, 3, 1), amount=100, kind="礼金"))
-    assert contract.transactions.history() == [
+    assert contract.transactions.to_json() == [
         {"date": "2020-01-01", "amount": 100, "kind": "家賃"},
         {"date": "2020-02-01", "amount": 100, "kind": "敷金"},
         {"date": "2020-03-01", "amount": 100, "kind": "礼金"},
@@ -33,7 +33,6 @@ def test_合計受取額を確認する(contract):
     transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
     transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
     transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="手数料"))
-    print(transactions.history())
     assert contract.transactions.total_reception() == 200
 
 
