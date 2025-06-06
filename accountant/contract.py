@@ -1,6 +1,7 @@
 import calendar
 from datetime import date
 from typing import TypedDict
+from dataclasses import dataclass
 
 
 class JSONTransaction(TypedDict):
@@ -9,20 +10,20 @@ class JSONTransaction(TypedDict):
     kind: str
 
 
+@dataclass
 class Transaction:
-    reception_kinds = ["家賃", "敷金", "礼金", "更新料", "共益費", "保証料"]
-    payment_kinds = ["手数料", "修繕費"]
+    date: date
+    amount: int
+    kind: str
 
-    def __init__(self, date: date, amount: int, kind: str):
-        self.date = date
-        self.amount = amount
-        self.kind = kind
-        self.type = self._judge_type()
+    _reception_kinds = ["家賃", "敷金", "礼金", "更新料", "共益費", "保証料"]
+    _payment_kinds = ["手数料", "修繕費"]
 
-    def _judge_type(self):
-        if self.kind in self.reception_kinds:
+    @property
+    def type(self):
+        if self.kind in self._reception_kinds:
             return "受取"
-        if self.kind in self.payment_kinds:
+        if self.kind in self._payment_kinds:
             return "支払"
         else:
             raise ValueError(f"Invalid kind: {self.kind}")
@@ -37,9 +38,9 @@ class Transaction:
     @classmethod
     def from_json(cls, data: JSONTransaction) -> "Transaction":
         return cls(
-            date.fromisoformat(data["date"]),
-            data["amount"],
-            data["kind"],
+            date=date.fromisoformat(data["date"]),
+            amount=data["amount"],
+            kind=data["kind"],
         )
 
 
@@ -49,6 +50,9 @@ class Transactions:
             if not isinstance(transaction, Transaction):
                 raise TypeError("All items must be of type Transaction")
         self.list = list(initial_list)
+
+    def __getitem__(self, index: int) -> Transaction:
+        return self.list[index]
 
     def total_reception(self):
         return sum(
