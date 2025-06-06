@@ -1,23 +1,21 @@
 from datetime import date
 
+from pytest import fixture
+
 from accountant.project import Project, JSONProject
 from accountant.contract import Contract, Transactions, Transaction
 
 
-def test_プロジェクトの新規作成():
-    project = Project(
-        name="Test Project",
-    )
-    assert project.name == "Test Project"
-    assert project.contracts == []
-
-
-def test_プロジェクトに契約を追加():
-    project = Project(
+@fixture
+def project():
+    return Project(
         name="Test Project",
     )
 
-    contract = Contract(
+
+@fixture
+def contract():
+    return Contract(
         fee=100,
         deposit=1000,
         key_money=1000,
@@ -25,23 +23,19 @@ def test_プロジェクトに契約を追加():
         end=date(2021, 1, 13),
     )
 
+
+def test_プロジェクトの新規作成(project):
+    assert project.name == "Test Project"
+    assert project.contracts == []
+
+
+def test_プロジェクトに契約を追加(project, contract):
     project.add_contract(contract)
     assert len(project.contracts) == 1
     assert project.contracts[0] == contract
 
 
-def test_プロジェクトに複数の契約を追加():
-    project = Project(
-        name="Test Project",
-    )
-
-    contract1 = Contract(
-        fee=100,
-        deposit=1000,
-        key_money=1000,
-        start=date(2020, 1, 14),
-        end=date(2021, 1, 13),
-    )
+def test_プロジェクトに複数の契約を追加(project, contract):
     contract2 = Contract(
         fee=200,
         deposit=2000,
@@ -50,29 +44,16 @@ def test_プロジェクトに複数の契約を追加():
         end=date(2022, 2, 13),
     )
 
-    project.add_contract(contract1)
+    project.add_contract(contract)
     project.add_contract(contract2)
 
     assert len(project.contracts) == 2
-    assert project.contracts[0] == contract1
+    assert project.contracts[0] == contract
     assert project.contracts[1] == contract2
 
 
-def test_プロジェクトをJSON形式で保存():
-    project = Project(
-        name="Test Project",
-    )
-
-    contract = Contract(
-        fee=100,
-        deposit=1000,
-        key_money=1000,
-        start=date(2020, 1, 14),
-        end=date(2021, 1, 13),
-    )
-
+def test_プロジェクトをJSON形式で保存(project, contract):
     project.add_contract(contract)
-
     json_data = project.to_json()
     assert json_data["name"] == "Test Project"
     assert len(json_data["contracts"]) == 1
