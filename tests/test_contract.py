@@ -16,6 +16,16 @@ def contract():
     )
 
 
+def test_取引の追加(contract):
+    transactions = contract.transactions
+    transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
+    transactions.register(Transaction(date=date(2020, 2, 1), amount=100, kind="敷金"))
+    transactions.register(Transaction(date=date(2020, 3, 1), amount=100, kind="礼金"))
+    assert transactions[0].date == date(2020, 1, 1)
+    assert transactions[1].amount == 100
+    assert transactions[2].kind == "礼金"
+
+
 def test_取引履歴を確認する(contract):
     transactions = contract.transactions
     transactions.register(Transaction(date=date(2020, 1, 1), amount=100, kind="家賃"))
