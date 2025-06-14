@@ -27,9 +27,14 @@ def main(page: ft.Page):
             }
         )
         initial_project.add_contract(new_contract)
-        contract_display.controls.append(
-            ft.Text(f"New Contract: {new_contract.to_json()}")
-        )
+        update_contract_display()
+
+    def update_contract_display():
+        contract_display.controls = [
+            ft.Text(
+                f"Contracts: {contract.to_json()}"
+            ) for contract in initial_project.contracts
+        ]
         contract_display.update()
 
     page.floating_action_button = ft.FloatingActionButton(
