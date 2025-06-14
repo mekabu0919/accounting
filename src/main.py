@@ -3,14 +3,21 @@ from accountant.project import Project
 from accountant.contract import Contract
 
 
+def contract_texts(project: Project):
+    if project.contracts:
+        return [
+            ft.Text(f"Contracts: {contract.to_json()}")
+            for contract in project.contracts
+        ]
+    else:
+        return [ft.Text("No contracts available")]
+
+
 def main(page: ft.Page):
+
     initial_project = Project("Initial Project")
     contract_display = ft.Column(
-        [
-            ft.Text(
-                f"Contracts: {initial_project.contracts[0].to_json() if initial_project.contracts else 'No contracts available'}"
-            )
-        ],
+        contract_texts(initial_project),
         alignment=ft.MainAxisAlignment.CENTER,
         expand=True,
     )
@@ -30,11 +37,7 @@ def main(page: ft.Page):
         update_contract_display()
 
     def update_contract_display():
-        contract_display.controls = [
-            ft.Text(
-                f"Contracts: {contract.to_json()}"
-            ) for contract in initial_project.contracts
-        ]
+        contract_display.controls = contract_texts(initial_project)
         contract_display.update()
 
     page.floating_action_button = ft.FloatingActionButton(
