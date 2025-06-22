@@ -87,10 +87,22 @@ class Person:
         }
 
 
+@dataclass
+class Room:
+    id: int
+    number: str
+
+    def to_json(self) -> dict[str, str | int]:
+        return {
+            "id": self.id,
+            "number": self.number,
+        }
+
+
 class JSONContract(TypedDict):
     id: int
     lessee: dict[str, str]
-    room: str
+    room: dict[str, str | int]
     fee: int
     deposit: int
     key_money: int
@@ -104,7 +116,7 @@ class Contract:
         self,
         id: int,
         lessee: Person,
-        room: str,
+        room: Room,
         fee: int,
         deposit: int,
         key_money: int,
@@ -138,7 +150,7 @@ class Contract:
         return {
             "id": self.id,
             "lessee": self.lessee.to_json(),
-            "room": self.room,
+            "room": self.room.to_json(),
             "fee": self.fee,
             "deposit": self.deposit,
             "key_money": self.key_money,
@@ -155,7 +167,7 @@ class Contract:
         return cls(
             id=data["id"],
             lessee=Person(**data["lessee"]),
-            room=data["room"],
+            room=Room(**data["room"]),
             fee=data["fee"],
             deposit=data["deposit"],
             key_money=data["key_money"],

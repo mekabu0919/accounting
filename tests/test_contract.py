@@ -2,7 +2,7 @@ from datetime import date
 
 from pytest import fixture
 
-from accountant.contract import Contract, Transaction, Person
+from accountant.contract import Contract, Transaction, Person, Room
 
 
 @fixture
@@ -10,7 +10,7 @@ def contract():
     return Contract(
         id=1,
         lessee=Person(family_name="Test", given_name="Lessee"),
-        room="101",
+        room=Room(id=1, number="101"),
         fee=100,
         deposit=1000,
         key_money=1000,
