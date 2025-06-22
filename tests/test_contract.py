@@ -8,6 +8,9 @@ from accountant.contract import Contract, Transaction
 @fixture
 def contract():
     return Contract(
+        id=1,
+        lessee="Test Lessee",
+        room="101",
         fee=100,
         deposit=1000,
         key_money=1000,

@@ -16,6 +16,9 @@ def project():
 @fixture
 def contract():
     return Contract(
+        id=1,
+        lessee="Test Lessee",
+        room="101",
         fee=100,
         deposit=1000,
         key_money=1000,
@@ -37,6 +40,9 @@ def test_プロジェクトに契約を追加(project, contract):
 
 def test_プロジェクトに複数の契約を追加(project, contract):
     contract2 = Contract(
+        id=2,
+        lessee="Another Lessee",
+        room="102",
         fee=200,
         deposit=2000,
         key_money=2000,
@@ -70,6 +76,9 @@ def test_JSON形式のプロジェクトデータを開く():
         "name": "Test Project",
         "contracts": [
             {
+                "id": 1,
+                "lessee": "Test Lessee",
+                "room": "101",
                 "fee": 100,
                 "deposit": 1000,
                 "key_money": 1000,

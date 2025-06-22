@@ -72,6 +72,9 @@ class Transactions:
 
 
 class JSONContract(TypedDict):
+    id: int
+    lessee: str
+    room: str
     fee: int
     deposit: int
     key_money: int
@@ -83,6 +86,9 @@ class JSONContract(TypedDict):
 class Contract:
     def __init__(
         self,
+        id: int,
+        lessee: str,
+        room: str,
         fee: int,
         deposit: int,
         key_money: int,
@@ -90,6 +96,9 @@ class Contract:
         end: date,
         transactions: Transactions | None = None,
     ):
+        self.id = id
+        self.lessee = lessee
+        self.room = room
         self.fee = fee
         self.deposit = deposit
         self.key_money = key_money
@@ -111,6 +120,9 @@ class Contract:
 
     def to_json(self) -> JSONContract:
         return {
+            "id": self.id,
+            "lessee": self.lessee,
+            "room": self.room,
             "fee": self.fee,
             "deposit": self.deposit,
             "key_money": self.key_money,
@@ -125,6 +137,9 @@ class Contract:
             [Transaction.from_json(t) for t in data["transactions"]]
         )
         return cls(
+            id=data["id"],
+            lessee=data["lessee"],
+            room=data["room"],
             fee=data["fee"],
             deposit=data["deposit"],
             key_money=data["key_money"],
