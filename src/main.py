@@ -8,6 +8,8 @@ def contract_texts(project: Project):
         return [
             ft.ExpansionTile(
                 title=ft.Text(f"Contract {i+1}"),
+                subtitle=ft.Text(f"Lessee: {contract.lessee}, Room: {contract.room}"),
+                leading=ft.Icon(ft.Icons.HOUSE),
                 controls=[
                     ft.Text(f"Fee: {contract.fee}"),
                     ft.Text(f"Deposit: {contract.deposit}"),
@@ -35,6 +37,9 @@ def main(page: ft.Page):
     def add_contract(e):
         new_contract = Contract.from_json(
             {
+                "id": len(initial_project.contracts) + 1,
+                "lessee": "New Lessee",
+                "room": "New Room",
                 "fee": 1000,
                 "deposit": 2000,
                 "key_money": 300,
