@@ -1,6 +1,6 @@
 import flet as ft
 from accountant.project import Project
-from accountant.contract import Contract
+from accountant.contract import Contract, Person
 
 
 def contract_texts(project: Project):
@@ -8,7 +8,7 @@ def contract_texts(project: Project):
         return [
             ft.ExpansionTile(
                 title=ft.Text(f"Contract {i+1}"),
-                subtitle=ft.Text(f"Lessee: {contract.lessee}, Room: {contract.room}"),
+                subtitle=ft.Text(f"Lessee: {contract.lessee.full_name}, Room: {contract.room}"),
                 leading=ft.Icon(ft.Icons.HOUSE),
                 controls=[
                     ft.Text(f"Fee: {contract.fee}"),
@@ -38,7 +38,7 @@ def main(page: ft.Page):
         new_contract = Contract.from_json(
             {
                 "id": len(initial_project.contracts) + 1,
-                "lessee": "New Lessee",
+                "lessee": {"family_name": "New", "given_name": "Lessee"},
                 "room": "New Room",
                 "fee": 1000,
                 "deposit": 2000,

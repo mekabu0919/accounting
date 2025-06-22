@@ -2,14 +2,14 @@ from datetime import date
 
 from pytest import fixture
 
-from accountant.contract import Contract, Transaction
+from accountant.contract import Contract, Transaction, Person
 
 
 @fixture
 def contract():
     return Contract(
         id=1,
-        lessee="Test Lessee",
+        lessee=Person(family_name="Test", given_name="Lessee"),
         room="101",
         fee=100,
         deposit=1000,
