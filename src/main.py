@@ -6,11 +6,21 @@ from accountant.contract import Contract
 def contract_texts(project: Project):
     if project.contracts:
         return [
-            ft.Text(f"Contracts: {contract.to_json()}")
-            for contract in project.contracts
+            ft.ExpansionTile(
+                title=ft.Text(f"Contract {i+1}"),
+                controls=[
+                    ft.Text(f"Fee: {contract.fee}"),
+                    ft.Text(f"Deposit: {contract.deposit}"),
+                    ft.Text(f"Key Money: {contract.key_money}"),
+                    ft.Text(f"Start: {contract.start}"),
+                    ft.Text(f"End: {contract.end}"),
+                    ft.Text(f"Transactions: {contract.transactions}"),
+                ],
+            )
+            for i, contract in enumerate(project.contracts)
         ]
     else:
-        return [ft.Text("No contracts available")]
+        return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
 
 
 def main(page: ft.Page):
@@ -36,13 +46,14 @@ def main(page: ft.Page):
         initial_project.add_contract(new_contract)
         update_contract_display()
 
+    add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=add_contract)
+    contract_display.controls.append(add_button)
+
     def update_contract_display():
         contract_display.controls = contract_texts(initial_project)
+        contract_display.controls.append(add_button)
         contract_display.update()
 
-    page.floating_action_button = ft.FloatingActionButton(
-        icon=ft.Icons.ADD, on_click=add_contract
-    )
     page.add(
         ft.SafeArea(
             ft.Container(
