@@ -71,6 +71,11 @@ class Transactions:
         return [transaction.to_json() for transaction in self.list]
 
 
+class JSONPerson(TypedDict):
+    family_name: str
+    given_name: str
+
+
 @dataclass
 class Person:
     family_name: str
@@ -80,11 +85,16 @@ class Person:
     def full_name(self) -> str:
         return f"{self.family_name} {self.given_name}"
 
-    def to_json(self) -> dict[str, str]:
+    def to_json(self) -> JSONPerson:
         return {
             "family_name": self.family_name,
             "given_name": self.given_name,
         }
+
+
+class JSONRoom(TypedDict):
+    id: int
+    number: str
 
 
 @dataclass
@@ -92,7 +102,7 @@ class Room:
     id: int
     number: str
 
-    def to_json(self) -> dict[str, str | int]:
+    def to_json(self) -> JSONRoom:
         return {
             "id": self.id,
             "number": self.number,
@@ -101,8 +111,8 @@ class Room:
 
 class JSONContract(TypedDict):
     id: int
-    lessee: dict[str, str]
-    room: dict[str, str | int]
+    lessee: JSONPerson
+    room: JSONRoom
     fee: int
     deposit: int
     key_money: int

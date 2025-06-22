@@ -8,7 +8,9 @@ def contract_texts(project: Project):
         return [
             ft.ExpansionTile(
                 title=ft.Text(f"Contract {i+1}"),
-                subtitle=ft.Text(f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"),
+                subtitle=ft.Text(
+                    f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"
+                ),
                 leading=ft.Icon(ft.Icons.HOUSE),
                 controls=[
                     ft.Text(f"Fee: {contract.fee}"),
