@@ -1,6 +1,7 @@
+from datetime import datetime, date
 import flet as ft
 from accountant.project import Project
-from accountant.contract import Contract
+from accountant.contract import Contract, Person, Room
 
 
 def contract_texts(project: Project):
@@ -68,21 +69,21 @@ def main(page: ft.Page):
     )
 
     def submit_contract():
-        new_contract = Contract.from_json(
-            {
-                "id": len(initial_project.contracts) + 1,
-                "lessee": {
-                    "family_name": lessee_family.value,
-                    "given_name": lessee_given.value,
-                },
-                "room": {"id": 1, "number": room_number.value},
-                "fee": int(fee.value),
-                "deposit": int(deposit.value),
-                "key_money": int(key_money.value),
-                "start": start.value,
-                "end": end.value,
-                "transactions": [],
-            }
+        new_contract = Contract(
+            id=len(initial_project.contracts) + 1,
+            lessee=Person(
+                family_name=lessee_family.value,
+                given_name=lessee_given.value,
+            ),
+            room=Room(
+                id=1,
+                number=room_number.value,
+            ),
+            fee=int(fee.value),
+            deposit=int(deposit.value),
+            key_money=int(key_money.value),
+            start=datetime.strptime(start.value, "%Y-%m-%d").date(),
+            end=datetime.strptime(end.value, "%Y-%m-%d").date(),
         )
         initial_project.add_contract(new_contract)
         update_contract_display()
