@@ -36,22 +36,71 @@ def main(page: ft.Page):
         expand=True,
     )
 
-    def add_contract(e):
+    # 入力用ダイアログの定義
+    lessee_family = ft.TextField(label="Lessee Family Name")
+    lessee_given = ft.TextField(label="Lessee Given Name")
+    room_number = ft.TextField(label="Room Number")
+    fee = ft.TextField(label="Fee", value="1000")
+    deposit = ft.TextField(label="Deposit", value="2000")
+    key_money = ft.TextField(label="Key Money", value="300")
+    start = ft.TextField(label="Start", value="2023-01-01")
+    end = ft.TextField(label="End", value="2023-12-31")
+
+    dialog = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("新規契約の追加"),
+        content=ft.Column(
+            [
+                lessee_family,
+                lessee_given,
+                room_number,
+                fee,
+                deposit,
+                key_money,
+                start,
+                end,
+            ]
+        ),
+        actions=[
+            ft.TextButton("キャンセル", on_click=lambda e: page.close(dialog)),
+            ft.TextButton("追加", on_click=lambda e: submit_contract()),
+        ],
+    )
+
+    def submit_contract():
         new_contract = Contract.from_json(
             {
                 "id": len(initial_project.contracts) + 1,
-                "lessee": {"family_name": "New", "given_name": "Lessee"},
-                "room": {"id": 1, "number": "101"},
-                "fee": 1000,
-                "deposit": 2000,
-                "key_money": 300,
-                "start": "2023-01-01",
-                "end": "2023-12-31",
+                "lessee": {
+                    "family_name": lessee_family.value,
+                    "given_name": lessee_given.value,
+                },
+                "room": {"id": 1, "number": room_number.value},
+                "fee": int(fee.value),
+                "deposit": int(deposit.value),
+                "key_money": int(key_money.value),
+                "start": start.value,
+                "end": end.value,
                 "transactions": [],
             }
         )
         initial_project.add_contract(new_contract)
         update_contract_display()
+        page.close(dialog)
+        page.update()
+
+    def add_contract(e):
+        # 入力欄を初期化
+        lessee_family.value = ""
+        lessee_given.value = ""
+        room_number.value = ""
+        fee.value = "1000"
+        deposit.value = "2000"
+        key_money.value = "300"
+        start.value = "2023-01-01"
+        end.value = "2023-12-31"
+        page.open(dialog)
+        page.update()
 
     add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=add_contract)
     contract_display.controls.append(add_button)
