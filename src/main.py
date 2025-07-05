@@ -1,34 +1,65 @@
-from datetime import datetime, date
+from datetime import datetime
 import flet as ft
 from accountant.project import Project
 from accountant.contract import Contract, Person, Room
 
 
-def contract_texts(project: Project):
-    if project.contracts:
-        return [
-            ft.ExpansionTile(
-                title=ft.Text(f"Contract {i+1}"),
-                subtitle=ft.Text(
-                    f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"
-                ),
-                leading=ft.Icon(ft.Icons.HOUSE),
-                controls=[
+def main(page: ft.Page):
+
+    def open_contract(contract: Contract):
+        # 契約の詳細をダイアログで表示
+        details = ft.AlertDialog(
+            modal=True,
+            title=ft.Text(f"契約詳細 (ID: {contract.id})"),
+            content=ft.Column(
+                [
+                    ft.Text(f"Lessee: {contract.lessee.full_name}"),
+                    ft.Text(f"Room: {contract.room.number}"),
                     ft.Text(f"Fee: {contract.fee}"),
                     ft.Text(f"Deposit: {contract.deposit}"),
                     ft.Text(f"Key Money: {contract.key_money}"),
                     ft.Text(f"Start: {contract.start}"),
                     ft.Text(f"End: {contract.end}"),
                     ft.Text(f"Transactions: {contract.transactions}"),
-                ],
-            )
-            for i, contract in enumerate(project.contracts)
-        ]
-    else:
-        return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
+                ]
+            ),
+            actions=[ft.TextButton("閉じる", on_click=lambda e: page.close(details))],
+        )
+        page.open(details)
+        page.update()
 
-
-def main(page: ft.Page):
+    def contract_texts(project: Project):
+        if project.contracts:
+            return [
+                ft.ExpansionTile(
+                    title=ft.Text(f"Contract {i+1}"),
+                    subtitle=ft.Text(
+                        f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"
+                    ),
+                    leading=ft.Icon(ft.Icons.HOUSE),
+                    controls=[
+                        ft.Text(f"Fee: {contract.fee}"),
+                        ft.Text(f"Deposit: {contract.deposit}"),
+                        ft.Text(f"Key Money: {contract.key_money}"),
+                        ft.Text(f"Start: {contract.start}"),
+                        ft.Text(f"End: {contract.end}"),
+                        ft.Text(f"Transactions: {contract.transactions}"),
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    "Open",
+                                    on_click=lambda e: open_contract(contract),
+                                    icon=ft.Icons.EDIT,
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                        ),
+                    ],
+                )
+                for i, contract in enumerate(project.contracts)
+            ]
+        else:
+            return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
 
     initial_project = Project("Initial Project")
     contract_display = ft.Column(
