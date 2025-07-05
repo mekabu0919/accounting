@@ -13,33 +13,40 @@ class NewContractDialog(ft.AlertDialog):
             title=ft.Text("新規契約の追加"),
             actions=[
                 ft.TextButton("キャンセル", on_click=lambda e: page.close(self)),
-                ft.TextButton("追加", on_click=lambda e: submit_contract()),
+                ft.TextButton(
+                    "追加",
+                    on_click=lambda e: self.submit_contract(
+                        page, initial_project, on_update
+                    ),
+                ),
             ],
         )
 
         self.initialize_input_fields()
 
-        def submit_contract():
-            new_contract = Contract(
-                id=len(initial_project.contracts) + 1,
-                lessee=Person(
-                    family_name=self.lessee_family.value,
-                    given_name=self.lessee_given.value,
-                ),
-                room=Room(
-                    id=1,
-                    number=self.room_number.value,
-                ),
-                fee=int(self.fee.value),
-                deposit=int(self.deposit.value),
-                key_money=int(self.key_money.value),
-                start=datetime.strptime(self.start.value, "%Y-%m-%d").date(),
-                end=datetime.strptime(self.end.value, "%Y-%m-%d").date(),
-            )
-            initial_project.add_contract(new_contract)
-            on_update()
-            page.close(self)
-            page.update()
+    def submit_contract(
+        self, page: ft.Page, initial_project: Project, on_update: Callable
+    ):
+        new_contract = Contract(
+            id=len(initial_project.contracts) + 1,
+            lessee=Person(
+                family_name=self.lessee_family.value,
+                given_name=self.lessee_given.value,
+            ),
+            room=Room(
+                id=1,
+                number=self.room_number.value,
+            ),
+            fee=int(self.fee.value),
+            deposit=int(self.deposit.value),
+            key_money=int(self.key_money.value),
+            start=datetime.strptime(self.start.value, "%Y-%m-%d").date(),
+            end=datetime.strptime(self.end.value, "%Y-%m-%d").date(),
+        )
+        initial_project.add_contract(new_contract)
+        on_update()
+        page.close(self)
+        page.update()
 
     def initialize_input_fields(self):
         self.lessee_family = ft.TextField(label="Lessee Family Name", value="Smith")
