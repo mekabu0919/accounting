@@ -8,71 +8,61 @@ from typing import Callable
 
 class NewContractDialog(ft.AlertDialog):
     def __init__(self, page: ft.Page, initial_project: Project, on_update: Callable):
-        # 入力用ダイアログの定義
-        lessee_family = ft.TextField(label="Lessee Family Name")
-        lessee_given = ft.TextField(label="Lessee Given Name")
-        room_number = ft.TextField(label="Room Number")
-        fee = ft.TextField(label="Fee", value="1000")
-        deposit = ft.TextField(label="Deposit", value="2000")
-        key_money = ft.TextField(label="Key Money", value="300")
-        start = ft.TextField(label="Start", value="2023-01-01")
-        end = ft.TextField(label="End", value="2023-12-31")
-
-        def set_initial_value():
-            # 入力欄を初期化
-            lessee_family.value = ""
-            lessee_given.value = ""
-            room_number.value = ""
-            fee.value = "1000"
-            deposit.value = "2000"
-            key_money.value = "300"
-            start.value = "2023-01-01"
-            end.value = "2023-12-31"
-
         super().__init__(
             modal=True,
             title=ft.Text("新規契約の追加"),
-            content=ft.Column(
-                [
-                    lessee_family,
-                    lessee_given,
-                    room_number,
-                    fee,
-                    deposit,
-                    key_money,
-                    start,
-                    end,
-                ]
-            ),
             actions=[
                 ft.TextButton("キャンセル", on_click=lambda e: page.close(self)),
                 ft.TextButton("追加", on_click=lambda e: submit_contract()),
             ],
         )
 
+        self.initialize_input_fields()
+
         def submit_contract():
             new_contract = Contract(
                 id=len(initial_project.contracts) + 1,
                 lessee=Person(
-                    family_name=lessee_family.value,
-                    given_name=lessee_given.value,
+                    family_name=self.lessee_family.value,
+                    given_name=self.lessee_given.value,
                 ),
                 room=Room(
                     id=1,
-                    number=room_number.value,
+                    number=self.room_number.value,
                 ),
-                fee=int(fee.value),
-                deposit=int(deposit.value),
-                key_money=int(key_money.value),
-                start=datetime.strptime(start.value, "%Y-%m-%d").date(),
-                end=datetime.strptime(end.value, "%Y-%m-%d").date(),
+                fee=int(self.fee.value),
+                deposit=int(self.deposit.value),
+                key_money=int(self.key_money.value),
+                start=datetime.strptime(self.start.value, "%Y-%m-%d").date(),
+                end=datetime.strptime(self.end.value, "%Y-%m-%d").date(),
             )
             initial_project.add_contract(new_contract)
             on_update()
             page.close(self)
             page.update()
 
-        set_initial_value()
+    def initialize_input_fields(self):
+        self.lessee_family = ft.TextField(label="Lessee Family Name", value="Smith")
+        self.lessee_given = ft.TextField(label="Lessee Given Name", value="John")
+        self.room_number = ft.TextField(label="Room Number", value="101")
+        self.fee = ft.TextField(label="Fee", value="1000")
+        self.deposit = ft.TextField(label="Deposit", value="2000")
+        self.key_money = ft.TextField(label="Key Money", value="300")
+        self.start = ft.TextField(label="Start", value="2023-01-01")
+        self.end = ft.TextField(label="End", value="2023-12-31")
+
+        self.content = ft.Column(
+            [
+                self.lessee_family,
+                self.lessee_given,
+                self.room_number,
+                self.fee,
+                self.deposit,
+                self.key_money,
+                self.start,
+                self.end,
+            ]
+        )
 
 
 def main(page: ft.Page):
