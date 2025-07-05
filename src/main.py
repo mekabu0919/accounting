@@ -3,80 +3,76 @@ import flet as ft
 from accountant.project import Project
 from accountant.contract import Contract, Person, Room
 
-
 from typing import Callable
 
 
-def initialize_contract_dialog(e, page: ft.Page, initial_project: Project, on_update: Callable):
-    # 入力用ダイアログの定義
-    lessee_family = ft.TextField(label="Lessee Family Name")
-    lessee_given = ft.TextField(label="Lessee Given Name")
-    room_number = ft.TextField(label="Room Number")
-    fee = ft.TextField(label="Fee", value="1000")
-    deposit = ft.TextField(label="Deposit", value="2000")
-    key_money = ft.TextField(label="Key Money", value="300")
-    start = ft.TextField(label="Start", value="2023-01-01")
-    end = ft.TextField(label="End", value="2023-12-31")
+class NewContractDialog(ft.AlertDialog):
+    def __init__(self, page: ft.Page, initial_project: Project, on_update: Callable):
+        # 入力用ダイアログの定義
+        lessee_family = ft.TextField(label="Lessee Family Name")
+        lessee_given = ft.TextField(label="Lessee Given Name")
+        room_number = ft.TextField(label="Room Number")
+        fee = ft.TextField(label="Fee", value="1000")
+        deposit = ft.TextField(label="Deposit", value="2000")
+        key_money = ft.TextField(label="Key Money", value="300")
+        start = ft.TextField(label="Start", value="2023-01-01")
+        end = ft.TextField(label="End", value="2023-12-31")
 
-    def set_initial_value():
-        # 入力欄を初期化
-        lessee_family.value = ""
-        lessee_given.value = ""
-        room_number.value = ""
-        fee.value = "1000"
-        deposit.value = "2000"
-        key_money.value = "300"
-        start.value = "2023-01-01"
-        end.value = "2023-12-31"
+        def set_initial_value():
+            # 入力欄を初期化
+            lessee_family.value = ""
+            lessee_given.value = ""
+            room_number.value = ""
+            fee.value = "1000"
+            deposit.value = "2000"
+            key_money.value = "300"
+            start.value = "2023-01-01"
+            end.value = "2023-12-31"
 
-    new_contract_dialog = ft.AlertDialog(
-        modal=True,
-        title=ft.Text("新規契約の追加"),
-        content=ft.Column(
-            [
-                lessee_family,
-                lessee_given,
-                room_number,
-                fee,
-                deposit,
-                key_money,
-                start,
-                end,
-            ]
-        ),
-        actions=[
-            ft.TextButton(
-                "キャンセル", on_click=lambda e: page.close(new_contract_dialog)
+        super().__init__(
+            modal=True,
+            title=ft.Text("新規契約の追加"),
+            content=ft.Column(
+                [
+                    lessee_family,
+                    lessee_given,
+                    room_number,
+                    fee,
+                    deposit,
+                    key_money,
+                    start,
+                    end,
+                ]
             ),
-            ft.TextButton("追加", on_click=lambda e: submit_contract()),
-        ],
-    )
-
-    def submit_contract():
-        new_contract = Contract(
-            id=len(initial_project.contracts) + 1,
-            lessee=Person(
-                family_name=lessee_family.value,
-                given_name=lessee_given.value,
-            ),
-            room=Room(
-                id=1,
-                number=room_number.value,
-            ),
-            fee=int(fee.value),
-            deposit=int(deposit.value),
-            key_money=int(key_money.value),
-            start=datetime.strptime(start.value, "%Y-%m-%d").date(),
-            end=datetime.strptime(end.value, "%Y-%m-%d").date(),
+            actions=[
+                ft.TextButton("キャンセル", on_click=lambda e: page.close(self)),
+                ft.TextButton("追加", on_click=lambda e: submit_contract()),
+            ],
         )
-        initial_project.add_contract(new_contract)
-        on_update()
-        page.close(new_contract_dialog)
-        page.update()
 
-    set_initial_value()
-    page.open(new_contract_dialog)
-    page.update()
+        def submit_contract():
+            new_contract = Contract(
+                id=len(initial_project.contracts) + 1,
+                lessee=Person(
+                    family_name=lessee_family.value,
+                    given_name=lessee_given.value,
+                ),
+                room=Room(
+                    id=1,
+                    number=room_number.value,
+                ),
+                fee=int(fee.value),
+                deposit=int(deposit.value),
+                key_money=int(key_money.value),
+                start=datetime.strptime(start.value, "%Y-%m-%d").date(),
+                end=datetime.strptime(end.value, "%Y-%m-%d").date(),
+            )
+            initial_project.add_contract(new_contract)
+            on_update()
+            page.close(self)
+            page.update()
+
+        set_initial_value()
 
 
 def main(page: ft.Page):
@@ -144,12 +140,14 @@ def main(page: ft.Page):
     )
 
     def add_clicked(e):
-        initialize_contract_dialog(
-            e,
-            page,
-            initial_project,
-            update_contract_display,
+        page.open(
+            NewContractDialog(
+                page,
+                initial_project,
+                update_contract_display,
+            )
         )
+        page.update()
 
     add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=add_clicked)
     contract_display.controls.append(add_button)
