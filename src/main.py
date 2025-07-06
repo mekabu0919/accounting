@@ -125,44 +125,51 @@ def top_contract_texts(project: Project, page: ft.Page):
         return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
 
 
-def create_contract_display(page: ft.Page):
-    initial_project = Project("Initial Project")
-    contract_display = ft.Column(
-        top_contract_texts(initial_project, page),
-        alignment=ft.MainAxisAlignment.CENTER,
-        expand=True,
-    )
+class ContractDisplay(ft.Column):
+    def __init__(self, project: Project, page: ft.Page):
+        super().__init__(
+            top_contract_texts(project, page),
+            alignment=ft.MainAxisAlignment.CENTER,
+            expand=True,
+        )
+        self.project = project
+        self.page: ft.Page = page
+        self.add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=self.add_clicked)
+        self.controls.append(self.add_button)
 
-    def add_clicked(e):
-        page.open(
+    def add_clicked(self, e):
+        self.page.open(
             NewContractDialog(
-                page,
-                len(initial_project.contracts) + 1,
-                update_contract_display,
+                self.page,
+                len(self.project.contracts) + 1,
+                self.update_contract_display,
             )
         )
-        page.update()
+        self.page.update()
 
-    add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=add_clicked)
-    contract_display.controls.append(add_button)
-
-    def update_contract_display(e: ft.ControlEvent):
+    def update_contract_display(self, e: ft.ControlEvent):
         if e.control.result is not None:
-            initial_project.add_contract(e.control.result)
-        contract_display.controls = top_contract_texts(initial_project, page)
-        contract_display.controls.append(add_button)
-        contract_display.update()
+            self.project.add_contract(e.control.result)
+        self.controls = top_contract_texts(self.project, self.page)
+        self.controls.append(self.add_button)
+        self.update()
 
-    return contract_display
+
+class App(ft.Column):
+    def __init__(self, page: ft.Page):
+        super().__init__(alignment=ft.MainAxisAlignment.CENTER, expand=True)
+        self.page = page
+        self.project = Project("My Project")
+        self.contract_display = ContractDisplay(self.project, page)
+        self.controls.append(self.contract_display)
 
 
 def main(page: ft.Page):
-    contract_display = create_contract_display(page)
-
+    page.title = "Accounting App"
     page.add(
         ft.SafeArea(
             ft.Container(
-                contract_display,
+                App(page),
                 alignment=ft.alignment.center,
             ),
             expand=True,
