@@ -69,57 +69,63 @@ class NewContractDialog(ft.AlertDialog):
         )
 
 
-def open_contract(contract: Contract, page: ft.Page):
-    # 契約の詳細をダイアログで表示
-    details = ft.AlertDialog(
-        modal=True,
-        title=ft.Text(f"契約詳細 (ID: {contract.id})"),
-        content=ft.Column(
-            [
-                ft.Text(f"Lessee: {contract.lessee.full_name}"),
-                ft.Text(f"Room: {contract.room.number}"),
+class ContractDisplayTile(ft.ExpansionTile):
+    def __init__(self, contract: Contract, page: ft.Page):
+        super().__init__(
+            title=ft.Text(f"Contract {contract.id}"),
+            subtitle=ft.Text(
+                f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"
+            ),
+            leading=ft.Icon(ft.Icons.HOUSE),
+            controls=[
                 ft.Text(f"Fee: {contract.fee}"),
                 ft.Text(f"Deposit: {contract.deposit}"),
                 ft.Text(f"Key Money: {contract.key_money}"),
                 ft.Text(f"Start: {contract.start}"),
                 ft.Text(f"End: {contract.end}"),
                 ft.Text(f"Transactions: {contract.transactions}"),
-            ]
-        ),
-        actions=[ft.TextButton("閉じる", on_click=lambda e: page.close(details))],
-    )
-    page.open(details)
+                ft.Row(
+                    [
+                        ft.TextButton(
+                            "Open",
+                            on_click=lambda e: self.open_contract(),
+                            icon=ft.Icons.EDIT,
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.END,
+                ),
+            ],
+        )
+        self.contract = contract
+        self.page: ft.Page = page
+
+    def open_contract(self):
+        # 契約の詳細をダイアログで表示
+        details = ft.AlertDialog(
+            modal=True,
+            title=ft.Text(f"契約詳細 (ID: {self.contract.id})"),
+            content=ft.Column(
+                [
+                    ft.Text(f"Lessee: {self.contract.lessee.full_name}"),
+                    ft.Text(f"Room: {self.contract.room.number}"),
+                    ft.Text(f"Fee: {self.contract.fee}"),
+                    ft.Text(f"Deposit: {self.contract.deposit}"),
+                    ft.Text(f"Key Money: {self.contract.key_money}"),
+                    ft.Text(f"Start: {self.contract.start}"),
+                    ft.Text(f"End: {self.contract.end}"),
+                    ft.Text(f"Transactions: {self.contract.transactions}"),
+                ]
+            ),
+            actions=[ft.TextButton("閉じる", on_click=lambda e: self.page.close(details))],
+        )
+        self.page.open(details)
 
 
 def create_contract_texts(project: Project, page: ft.Page):
     if project.contracts:
         return [
-            ft.ExpansionTile(
-                title=ft.Text(f"Contract {i+1}"),
-                subtitle=ft.Text(
-                    f"Lessee: {contract.lessee.full_name}, Room: {contract.room.number}"
-                ),
-                leading=ft.Icon(ft.Icons.HOUSE),
-                controls=[
-                    ft.Text(f"Fee: {contract.fee}"),
-                    ft.Text(f"Deposit: {contract.deposit}"),
-                    ft.Text(f"Key Money: {contract.key_money}"),
-                    ft.Text(f"Start: {contract.start}"),
-                    ft.Text(f"End: {contract.end}"),
-                    ft.Text(f"Transactions: {contract.transactions}"),
-                    ft.Row(
-                        [
-                            ft.TextButton(
-                                "Open",
-                                on_click=lambda e: open_contract(contract, page),
-                                icon=ft.Icons.EDIT,
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.END,
-                    ),
-                ],
-            )
-            for i, contract in enumerate(project.contracts)
+            ContractDisplayTile(contract, page)
+            for contract in project.contracts
         ]
     else:
         return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
@@ -133,7 +139,9 @@ class ContractDisplay(ft.Column):
         )
         self.project = project
         self.page: ft.Page = page
-        self.add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=self.add_button_clicked)
+        self.add_button = ft.IconButton(
+            icon=ft.Icons.ADD, on_click=self.add_button_clicked
+        )
         self.controls = create_contract_texts(self.project, self.page)
         self.controls.append(self.add_button)
 
