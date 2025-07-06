@@ -7,7 +7,7 @@ from typing import Callable
 
 
 class NewContractDialog(ft.AlertDialog):
-    def __init__(self, page: ft.Page, initial_project: Project, on_update: Callable):
+    def __init__(self, page: ft.Page, id: int, on_dismiss: Callable):
         super().__init__(
             modal=True,
             title=ft.Text("新規契約の追加"),
@@ -15,20 +15,19 @@ class NewContractDialog(ft.AlertDialog):
                 ft.TextButton("キャンセル", on_click=lambda e: page.close(self)),
                 ft.TextButton(
                     "追加",
-                    on_click=lambda e: self.submit_contract(
-                        page, initial_project, on_update
-                    ),
+                    on_click=lambda e: self.submit_contract(),
                 ),
             ],
+            on_dismiss=on_dismiss,
         )
-
+        self.page: ft.Page = page
+        self.id = id
+        self.result = None
         self.initialize_input_fields()
 
-    def submit_contract(
-        self, page: ft.Page, initial_project: Project, on_update: Callable
-    ):
+    def submit_contract(self):
         new_contract = Contract(
-            id=len(initial_project.contracts) + 1,
+            id=self.id,
             lessee=Person(
                 family_name=self.lessee_family.value,
                 given_name=self.lessee_given.value,
@@ -43,10 +42,8 @@ class NewContractDialog(ft.AlertDialog):
             start=datetime.strptime(self.start.value, "%Y-%m-%d").date(),
             end=datetime.strptime(self.end.value, "%Y-%m-%d").date(),
         )
-        initial_project.add_contract(new_contract)
-        on_update()
-        page.close(self)
-        page.update()
+        self.result = new_contract
+        self.page.close(self)
 
     def initialize_input_fields(self):
         self.lessee_family = ft.TextField(label="Lessee Family Name", value="Smith")
@@ -140,7 +137,7 @@ def main(page: ft.Page):
         page.open(
             NewContractDialog(
                 page,
-                initial_project,
+                len(initial_project.contracts) + 1,
                 update_contract_display,
             )
         )
@@ -149,7 +146,9 @@ def main(page: ft.Page):
     add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=add_clicked)
     contract_display.controls.append(add_button)
 
-    def update_contract_display():
+    def update_contract_display(e: ft.ControlEvent):
+        if e.control.result is not None:
+            initial_project.add_contract(e.control.result)
         contract_display.controls = contract_texts(initial_project)
         contract_display.controls.append(add_button)
         contract_display.update()
