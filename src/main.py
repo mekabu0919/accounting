@@ -121,16 +121,6 @@ class ContractDisplayTile(ft.ExpansionTile):
         self.page.open(details)
 
 
-def create_contract_texts(project: Project, page: ft.Page):
-    if project.contracts:
-        return [
-            ContractDisplayTile(contract, page)
-            for contract in project.contracts
-        ]
-    else:
-        return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
-
-
 class ContractDisplay(ft.Column):
     def __init__(self, project: Project, page: ft.Page):
         super().__init__(
@@ -142,7 +132,7 @@ class ContractDisplay(ft.Column):
         self.add_button = ft.IconButton(
             icon=ft.Icons.ADD, on_click=self.add_button_clicked
         )
-        self.controls = create_contract_texts(self.project, self.page)
+        self.controls = self.create_contract_tiles()
         self.controls.append(self.add_button)
 
     def add_button_clicked(self, e):
@@ -158,9 +148,18 @@ class ContractDisplay(ft.Column):
     def show_contracts(self, e: ft.ControlEvent):
         if e.control.result is not None:
             self.project.add_contract(e.control.result)
-        self.controls = create_contract_texts(self.project, self.page)
+        self.controls = self.create_contract_tiles()
         self.controls.append(self.add_button)
         self.update()
+
+    def create_contract_tiles(self):
+        if self.project.contracts:
+            return [
+                ContractDisplayTile(contract, self.page)
+                for contract in self.project.contracts
+            ]
+        else:
+            return [ft.ExpansionTile(title=ft.Text("No contracts available"))]
 
 
 class App(ft.Column):
