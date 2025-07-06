@@ -91,7 +91,7 @@ def open_contract(contract: Contract, page: ft.Page):
     page.open(details)
 
 
-def top_contract_texts(project: Project, page: ft.Page):
+def create_contract_texts(project: Project, page: ft.Page):
     if project.contracts:
         return [
             ft.ExpansionTile(
@@ -128,29 +128,29 @@ def top_contract_texts(project: Project, page: ft.Page):
 class ContractDisplay(ft.Column):
     def __init__(self, project: Project, page: ft.Page):
         super().__init__(
-            top_contract_texts(project, page),
             alignment=ft.MainAxisAlignment.CENTER,
             expand=True,
         )
         self.project = project
         self.page: ft.Page = page
-        self.add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=self.add_clicked)
+        self.add_button = ft.IconButton(icon=ft.Icons.ADD, on_click=self.add_button_clicked)
+        self.controls = create_contract_texts(self.project, self.page)
         self.controls.append(self.add_button)
 
-    def add_clicked(self, e):
+    def add_button_clicked(self, e):
         self.page.open(
             NewContractDialog(
                 self.page,
                 len(self.project.contracts) + 1,
-                self.update_contract_display,
+                self.show_contracts,
             )
         )
         self.page.update()
 
-    def update_contract_display(self, e: ft.ControlEvent):
+    def show_contracts(self, e: ft.ControlEvent):
         if e.control.result is not None:
             self.project.add_contract(e.control.result)
-        self.controls = top_contract_texts(self.project, self.page)
+        self.controls = create_contract_texts(self.project, self.page)
         self.controls.append(self.add_button)
         self.update()
 
