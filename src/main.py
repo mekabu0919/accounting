@@ -129,8 +129,8 @@ class ContractDisplay(ft.Column):
         )
         self.project = project
         self.page: ft.Page = page
-        self.add_button = ft.IconButton(
-            icon=ft.Icons.ADD, on_click=self.add_button_clicked
+        self.add_button = ft.FilledButton(
+            "Add new contract", icon=ft.Icons.ADD, on_click=self.add_button_clicked
         )
         self.controls = self.create_contract_tiles()
         self.controls.append(self.add_button)
