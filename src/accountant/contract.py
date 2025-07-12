@@ -3,6 +3,8 @@ from datetime import date
 from typing import TypedDict
 from dataclasses import dataclass
 
+from .room import Room, JSONRoom
+
 
 class JSONTransaction(TypedDict):
     date: str
@@ -89,23 +91,6 @@ class Person:
         return {
             "family_name": self.family_name,
             "given_name": self.given_name,
-        }
-
-
-class JSONRoom(TypedDict):
-    id: int
-    number: str
-
-
-@dataclass
-class Room:
-    id: int
-    number: str
-
-    def to_json(self) -> JSONRoom:
-        return {
-            "id": self.id,
-            "number": self.number,
         }
 
 

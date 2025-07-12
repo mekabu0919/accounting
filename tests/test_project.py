@@ -3,7 +3,8 @@ from datetime import date
 from pytest import fixture
 
 from accountant.project import Project, JSONProject
-from accountant.contract import Contract, Transactions, Transaction, Person, Room
+from accountant.contract import Contract, Transactions, Transaction, Person
+from accountant.room import Room
 
 
 @fixture

@@ -2,7 +2,8 @@ from datetime import date
 
 from pytest import fixture
 
-from accountant.contract import Contract, Transaction, Person, Room
+from accountant.contract import Contract, Transaction, Person
+from accountant.room import Room
 
 
 @fixture
