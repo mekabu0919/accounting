@@ -68,7 +68,7 @@ def test_プロジェクトをJSON形式で保存(project, contract):
     assert json_data["contracts"][0]["id"] == 1
     assert json_data["contracts"][0]["lessee"]["family_name"] == "Test"
     assert json_data["contracts"][0]["lessee"]["given_name"] == "Lessee"
-    assert json_data["contracts"][0]["room"] == {"id": 1, "number": "101"}
+    assert json_data["contracts"][0]["room_id"] == 1
     assert json_data["contracts"][0]["fee"] == 100
     assert json_data["contracts"][0]["deposit"] == 1000
     assert json_data["contracts"][0]["key_money"] == 1000
@@ -85,7 +85,7 @@ def test_JSON形式のプロジェクトデータを開く():
             {
                 "id": 1,
                 "lessee": {"family_name": "Test", "given_name": "Lessee"},
-                "room": {"id": 1, "number": "101"},
+                "room_id": 1,
                 "fee": 100,
                 "deposit": 1000,
                 "key_money": 1000,

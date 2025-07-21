@@ -3,7 +3,7 @@ from datetime import date
 from typing import TypedDict
 from dataclasses import dataclass
 
-from .room import Room, JSONRoom
+from .room import Room, Rooms
 
 
 class JSONTransaction(TypedDict):
@@ -97,7 +97,7 @@ class Person:
 class JSONContract(TypedDict):
     id: int
     lessee: JSONPerson
-    room: JSONRoom
+    room_id: int
     fee: int
     deposit: int
     key_money: int
@@ -145,7 +145,7 @@ class Contract:
         return {
             "id": self.id,
             "lessee": self.lessee.to_json(),
-            "room": self.room.to_json(),
+            "room_id": self.room.id,
             "fee": self.fee,
             "deposit": self.deposit,
             "key_money": self.key_money,
@@ -155,14 +155,14 @@ class Contract:
         }
 
     @classmethod
-    def from_json(cls, data: JSONContract) -> "Contract":
+    def from_json(cls, data: JSONContract, rooms: Rooms) -> "Contract":
         transactions = Transactions(
             [Transaction.from_json(t) for t in data["transactions"]]
         )
         return cls(
             id=data["id"],
             lessee=Person(**data["lessee"]),
-            room=Room(**data["room"]),
+            room=rooms.get(data["room_id"]),
             fee=data["fee"],
             deposit=data["deposit"],
             key_money=data["key_money"],

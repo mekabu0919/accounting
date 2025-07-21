@@ -3,6 +3,7 @@ from typing import TypedDict
 from .contract import Contract, JSONContract
 from .room import Rooms, JSONRoom
 
+
 class JSONProject(TypedDict):
     name: str
     contracts: list[JSONContract]
@@ -10,7 +11,12 @@ class JSONProject(TypedDict):
 
 
 class Project:
-    def __init__(self, name: str, contracts: list[Contract] | None = None, rooms: Rooms | None = None):
+    def __init__(
+        self,
+        name: str,
+        contracts: list[Contract] | None = None,
+        rooms: Rooms | None = None,
+    ):
         self.name = name
         self.contracts = contracts if contracts is not None else []
         self.rooms = rooms if rooms is not None else Rooms()
@@ -27,11 +33,12 @@ class Project:
 
     @classmethod
     def from_json(cls, json_data: JSONProject) -> "Project":
+        rooms = Rooms.from_json(json_data["rooms"])
         return cls(
             name=json_data["name"],
             contracts=[
-                Contract.from_json(contract_data)
+                Contract.from_json(contract_data, rooms)
                 for contract_data in json_data["contracts"]
             ],
-            rooms=Rooms.from_json(json_data["rooms"]),
+            rooms=rooms,
         )
