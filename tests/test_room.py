@@ -1,5 +1,5 @@
 from accountant.room import Room, JSONRoom, Rooms
-
+from accountant.contract import Contract
 
 def test_部屋情報をJSON形式で保存():
     room = Room(id=1, number="101")
@@ -36,3 +36,18 @@ def test_部屋のリストをJSON形式から復元():
     assert rooms.list[0].number == "101"
     assert rooms.list[1].id == 2
     assert rooms.list[1].number == "102"
+
+
+def test_idで部屋を取得する():
+    rooms = Rooms()
+    rooms.add(Room(id=1, number="101"))
+    rooms.add(Room(id=2, number="102"))
+    room = rooms.get(id=1)
+    assert room.id == 1
+    assert room.number == "101"
+
+# def test_部屋に紐づいた契約を取得する():
+#     rooms = Rooms()
+#     rooms.add(Room(id=1, number="101"))
+#     contract = Contract(id=1, room_id=1, details="Test Contract")
+#     contracts = rooms..get_contracts()  # Assuming this method exists

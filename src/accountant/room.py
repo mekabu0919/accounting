@@ -17,7 +17,7 @@ class Room:
             "id": self.id,
             "number": self.number,
         }
-    
+
     @classmethod
     def from_json(cls, data: JSONRoom) -> "Room":
         return cls(id=data["id"], number=data["number"])
@@ -29,6 +29,12 @@ class Rooms:
 
     def add(self, room: Room):
         self.list.append(room)
+
+    def get(self, id: int) -> Room:
+        for room in self.list:
+            if room.id == id:
+                return room
+        raise ValueError(f"Room with id {id} not found")
 
     def to_json(self) -> list[JSONRoom]:
         return [room.to_json() for room in self.list]
