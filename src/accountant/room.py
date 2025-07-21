@@ -36,6 +36,9 @@ class Rooms:
     def get(self, id: int) -> Room:
         return self._id_map[id]
 
+    def get_all(self) -> list[Room]:
+        return list(self._id_map.values())
+
     def to_json(self) -> dict[int, JSONRoom]:
         return {id: room.to_json() for id, room in self._id_map.items()}
 

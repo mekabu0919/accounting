@@ -1,13 +1,13 @@
 from datetime import datetime
 import flet as ft
 from accountant.project import Project
-from accountant.contract import Contract, Person, Room
+from accountant.contract import Contract, Person, Room, Rooms
 
 from typing import Callable
 
 
 class NewContractDialog(ft.AlertDialog):
-    def __init__(self, page: ft.Page, id: int, on_dismiss: Callable):
+    def __init__(self, rooms: Rooms, page: ft.Page, id: int, on_dismiss: Callable):
         super().__init__(
             modal=True,
             title=ft.Text("新規契約の追加"),
@@ -20,6 +20,7 @@ class NewContractDialog(ft.AlertDialog):
             ],
             on_dismiss=on_dismiss,
         )
+        self.rooms = rooms
         self.page: ft.Page = page
         self.id = id
         self.result = None
@@ -32,10 +33,7 @@ class NewContractDialog(ft.AlertDialog):
                 family_name=self.lessee_family.value,
                 given_name=self.lessee_given.value,
             ),
-            room=Room(
-                id=1,
-                number=self.room_number.value,
-            ),
+            room=self.rooms.get(int(self.room_id.value)),
             fee=int(self.fee.value),
             deposit=int(self.deposit.value),
             key_money=int(self.key_money.value),
@@ -48,7 +46,13 @@ class NewContractDialog(ft.AlertDialog):
     def initialize_input_fields(self):
         self.lessee_family = ft.TextField(label="Lessee Family Name", value="Smith")
         self.lessee_given = ft.TextField(label="Lessee Given Name", value="John")
-        self.room_number = ft.TextField(label="Room Number", value="101")
+        self.room_id = ft.Dropdown(
+            label="Room",
+            options=[
+                ft.DropdownOption(key=str(room.id), text=room.number)
+                for room in self.rooms.get_all()
+            ],
+        )
         self.fee = ft.TextField(label="Fee", value="1000")
         self.deposit = ft.TextField(label="Deposit", value="2000")
         self.key_money = ft.TextField(label="Key Money", value="300")
@@ -59,7 +63,7 @@ class NewContractDialog(ft.AlertDialog):
             [
                 self.lessee_family,
                 self.lessee_given,
-                self.room_number,
+                self.room_id,
                 self.fee,
                 self.deposit,
                 self.key_money,
@@ -116,7 +120,9 @@ class ContractDisplayTile(ft.ExpansionTile):
                     ft.Text(f"Transactions: {self.contract.transactions}"),
                 ]
             ),
-            actions=[ft.TextButton("閉じる", on_click=lambda e: self.page.close(details))],
+            actions=[
+                ft.TextButton("閉じる", on_click=lambda e: self.page.close(details))
+            ],
         )
         self.page.open(details)
 
@@ -138,9 +144,10 @@ class ContractDisplay(ft.Column):
     def add_button_clicked(self, e):
         self.page.open(
             NewContractDialog(
-                self.page,
-                len(self.project.contracts) + 1,
-                self.show_contracts,
+                rooms=self.project.rooms,
+                page=self.page,
+                id=len(self.project.contracts) + 1,
+                on_dismiss=self.show_contracts,
             )
         )
         self.page.update()
@@ -166,7 +173,9 @@ class App(ft.Column):
     def __init__(self, page: ft.Page):
         super().__init__(alignment=ft.MainAxisAlignment.CENTER, expand=True)
         self.page = page
-        self.project = Project("My Project")
+        self.project = Project(
+            "My Project", contracts=[], rooms=Rooms({1: Room(id=1, number="101")})
+        )
         self.contract_display = ContractDisplay(self.project, page)
         self.controls.append(self.contract_display)
 
