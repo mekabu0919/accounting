@@ -19,17 +19,17 @@ def test_部屋のリストをJSON形式で保存():
     rooms.add(Room(id=1, number="101"))
     rooms.add(Room(id=2, number="102"))
     json_data = rooms.to_json()
-    assert json_data == [
-        {"id": 1, "number": "101"},
-        {"id": 2, "number": "102"},
-    ]
+    assert json_data == {
+        1: {"id": 1, "number": "101"},
+        2: {"id": 2, "number": "102"},
+    }
 
 
 def test_部屋のリストをJSON形式から復元():
-    json_data: list[JSONRoom] = [
-        {"id": 1, "number": "101"},
-        {"id": 2, "number": "102"},
-    ]
+    json_data: dict[int, JSONRoom] = {
+        1: {"id": 1, "number": "101"},
+        2: {"id": 2, "number": "102"},
+    }
     rooms = Rooms.from_json(json_data)
     assert len(rooms.list) == 2
     assert rooms.list[0].id == 1
