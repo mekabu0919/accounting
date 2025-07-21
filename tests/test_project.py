@@ -64,17 +64,19 @@ def test_プロジェクトをJSON形式で保存(project, contract):
     project.add_contract(contract)
     json_data = project.to_json()
     assert json_data["name"] == "Test Project"
-    assert len(json_data["contracts"]) == 1
-    assert json_data["contracts"][0]["id"] == 1
-    assert json_data["contracts"][0]["lessee"]["family_name"] == "Test"
-    assert json_data["contracts"][0]["lessee"]["given_name"] == "Lessee"
-    assert json_data["contracts"][0]["room_id"] == 1
-    assert json_data["contracts"][0]["fee"] == 100
-    assert json_data["contracts"][0]["deposit"] == 1000
-    assert json_data["contracts"][0]["key_money"] == 1000
-    assert json_data["contracts"][0]["start"] == "2020-01-14"
-    assert json_data["contracts"][0]["end"] == "2021-01-13"
-    assert json_data["contracts"][0]["transactions"] == []
+    assert json_data["contracts"] == [
+        {
+            "id": 1,
+            "lessee": {"family_name": "Test", "given_name": "Lessee"},
+            "room_id": 1,
+            "fee": 100,
+            "deposit": 1000,
+            "key_money": 1000,
+            "start": "2020-01-14",
+            "end": "2021-01-13",
+            "transactions": [],
+        }
+    ]
     assert json_data["rooms"] == {1: {"id": 1, "number": "101"}}
 
 
