@@ -4,13 +4,14 @@ from pytest import fixture
 
 from accountant.project import Project, JSONProject
 from accountant.contract import Contract, Transactions, Transaction, Person
-from accountant.room import Room
+from accountant.room import Room, Rooms
 
 
 @fixture
 def project():
     return Project(
         name="Test Project",
+        rooms=Rooms({1: Room(id=1, number="101")}),
     )
 
 
@@ -74,6 +75,7 @@ def test_プロジェクトをJSON形式で保存(project, contract):
     assert json_data["contracts"][0]["start"] == "2020-01-14"
     assert json_data["contracts"][0]["end"] == "2021-01-13"
     assert json_data["contracts"][0]["transactions"] == []
+    assert json_data["rooms"] == {1: {"id": 1, "number": "101"}}
 
 
 def test_JSON形式のプロジェクトデータを開く():
@@ -98,6 +100,7 @@ def test_JSON形式のプロジェクトデータを開く():
                 ],
             }
         ],
+        "rooms": {1: {"id": 1, "number": "101"}},
     }
 
     project = Project.from_json(json_data)
