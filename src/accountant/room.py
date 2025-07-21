@@ -24,24 +24,21 @@ class Room:
 
 
 class Rooms:
-    def __init__(self):
-        self.list: list[Room] = []
+    def __init__(self, initial_data: dict[int, Room] = {}):
+        self._id_map: dict[int, Room] = initial_data
 
     def add(self, room: Room):
-        self.list.append(room)
+        self._id_map[room.id] = room
+
+    def __len__(self) -> int:
+        return len(self._id_map)
 
     def get(self, id: int) -> Room:
-        for room in self.list:
-            if room.id == id:
-                return room
-        raise ValueError(f"Room with id {id} not found")
+        return self._id_map[id]
 
     def to_json(self) -> dict[int, JSONRoom]:
-        return {room.id: room.to_json() for room in self.list}
+        return {id: room.to_json() for id, room in self._id_map.items()}
 
     @classmethod
     def from_json(cls, json_data: dict[int, JSONRoom]) -> "Rooms":
-        rooms = cls()
-        for id, room_data in json_data.items():
-            rooms.add(Room(**room_data))
-        return rooms
+        return cls(initial_data={id: Room.from_json(data) for id, data in json_data.items()})
